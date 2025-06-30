@@ -17,6 +17,8 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -40,40 +42,59 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Create Post')
-                    ->description('Create a new post here')
-                    ->schema([
-                        TextInput::make('title')->minLength(3)->maxLength(10)->required(),
-                        TextInput::make('slug')->required()->unique(ignoreRecord: true),
-                        Select::make('category_id')
-                            ->label('Category')
-                            ->relationship('category', 'name')
-                            ->searchable()
-                            ->required(),
-                        ColorPicker::make('color')->required(),
-                        MarkdownEditor::make('content')->required()->columnSpanFull(),
-                    ])->columnSpan(2)->columns(2),
-
-                Group::make()->schema([
-                    Section::make('Image')
-                        ->collapsible()
+                Tabs::make('Create a new Post')->tabs([
+                    Tab::make('Post')
+                        ->icon('heroicon-o-inbox')
+                        ->badge('New')
                         ->schema([
-                            FileUpload::make('thumbnail')
-                                ->disk('public')
-                                ->directory('thumbnails'),
-                        ])->columnSpan(1),
-                    Section::make('Meta')->schema([
-                        TagsInput::make('tags')->required(),
+                            TextInput::make('title')->minLength(3)->maxLength(10)->required(),
+                            TextInput::make('slug')->required()->unique(ignoreRecord: true),
+                            Select::make('category_id')
+                                ->label('Category')
+                                ->relationship('category', 'name')
+                                ->searchable()
+                                ->required(),
+                            ColorPicker::make('color')->required(),
+                        ]),
+                    Tab::make('Content')->schema([
+                        MarkdownEditor::make('content')->required()->columnSpanFull(),
+                    ]),
+                    Tab::make('Image')->schema([
+                        FileUpload::make('thumbnail')
+                            ->disk('public')
+                            ->directory('thumbnails'),
+                    ]),
+                    Tab::make('Meta')->schema([
+                        TagsInput::make('tags')->required()->columnSpanFull(),
                         Checkbox::make('published'),
                     ]),
-                    // Section::make('Authors')->schema([
-                    //     CheckboxList::make('authors',)
-                    //         ->label('Co authors')
-                    //         // ->multiple()
-                    //         ->relationship('authors', 'name')
-                    //     // ->preload()
-                    // ]),
-                ])->columnSpan(1),
+                ])->columnSpanFull()->columns(2)->activeTab(1)->persistTabInQueryString(),
+
+                // Section::make('Create Post')
+                //     ->description('Create a new post here')
+                //     ->schema([])->columnSpan(2)->columns(2),
+
+                // Group::make()->schema([
+                //     Section::make('Image')
+                //         ->collapsible()
+                //         ->schema([
+                //             FileUpload::make('thumbnail')
+                //                 ->disk('public')
+                //                 ->directory('thumbnails'),
+                //         ])->columnSpan(1),
+                //     Section::make('Meta')->schema([
+                //         TagsInput::make('tags')->required(),
+                //         Checkbox::make('published'),
+                //     ]),
+                //     // Section::make('Authors')->schema([
+                //     //     CheckboxList::make('authors',)
+                //     //         ->label('Co authors')
+                //     //         // ->multiple()
+                //     //         ->relationship('authors', 'name')
+                //     //     // ->preload()
+                //     // ]),
+                // ])->columnSpan(1),
+
             ])->columns(3);
     }
 
