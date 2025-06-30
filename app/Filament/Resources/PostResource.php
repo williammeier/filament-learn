@@ -44,8 +44,10 @@ class PostResource extends Resource
                         TextInput::make('title')->minLength(3)->maxLength(10)->required(),
                         TextInput::make('slug')->required()->unique(ignoreRecord: true),
                         Select::make('category_id')
-                            ->label('Category')->required()->exists('categories', 'id')
-                            ->options(Category::all()->pluck('name', 'id')),
+                            ->label('Category')
+                            ->relationship('category', 'name')
+                            ->searchable()
+                            ->required(),
                         ColorPicker::make('color')->required(),
                         MarkdownEditor::make('content')->required()->columnSpanFull(),
                     ])->columnSpan(2)->columns(2),
@@ -103,7 +105,7 @@ class PostResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Editar'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
